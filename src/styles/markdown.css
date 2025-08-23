@@ -1,3 +1,4 @@
+@import './main.css'; /*temporary fix to build fails*/
 .custom-md {
     h1 {
         @apply text-3xl;
