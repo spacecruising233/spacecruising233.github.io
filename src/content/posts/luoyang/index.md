@@ -209,6 +209,14 @@ while(competition) rp++;
 
 ![](tomb2.jpg)
 
+### 2:30
+
+美好的下午
+
+![](afternoon1.jpg)
+
+![](afternoon2.jpg)
+
 **(WIP/Work In Progress)**
 
 **(to be continued......)**
