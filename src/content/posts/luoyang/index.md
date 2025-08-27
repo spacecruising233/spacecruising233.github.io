@@ -209,16 +209,6 @@ while(competition) rp++;
 
 ![](tomb2.jpg)
 
-### 2:30
-
-和穗穗的美好下午
-
-## 2025-08-26
-
-### 7:15
+**(WIP/Work In Progress)**
 
 **(to be continued......)**
-
----
-
-upd 2025-08-26: 更新24~26号的事件。
