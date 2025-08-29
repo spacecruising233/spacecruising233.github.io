@@ -39,6 +39,8 @@ draft: false
 
 性质1和性质3都很直观，此处略去不证。
 
+> 下文中，用 $(a, b)$ 表示从 $a$ 到 $b$ 的路径。
+
 ### 证明（性质4）
 
 如图，可说明树的直径不一定唯一。
@@ -73,6 +75,12 @@ draft: false
 容易发现 $(a, m) \ge (d, n)$ 。
 
 则 $(a, c) = (a, m) + (m, n) + (n, c) > (a, m) + (n, c) \ge (d, n) + (n, c) = (d, c)$ ，与 $(d, c)$ 是直径矛盾。
+
+### 推论
+
+树有多条直径时，直径长度必然为奇数。
+
+（显然。）
 
 ## 03 求法1 - 两遍DFS
 
@@ -242,6 +250,16 @@ int main(){
 
 事实上，还有另一种开一个数组的求法，见[OI Wiki](https://oiwiki.com/graph/tree-diameter/#%E8%BF%87%E7%A8%8B-2)。
 
+## 05 习题
+
+[B4016 树的直径 - 洛谷](https://www.luogu.com.cn/problem/B4016) 板题
+
+[P5536 【XR-3】核心城市 - 洛谷](https://www.luogu.com.cn/problem/P5536) 你可以证明你的答案的正确性吗？
+
+[P3304 [SDOI2013] 直径 - 洛谷](https://www.luogu.com.cn/problem/P3304) 带边权树的直径
+
+[P3761 [TJOI2017] 城市 - 洛谷](https://www.luogu.com.cn/problem/P3761) 直径的“断”与“连”
+
 # 树的重心
 
 ## 01 定义
@@ -263,10 +281,8 @@ int main(){
 
 4. 往树上加叶子节点，重心的距离改变量 $\le 1$ 。
 
-5. 两棵树合并后，新的重心在两树原重心间路径上。
-   
-   **强化命题**：新的重心在较大树上；  
-                      两树大小相同，则在连接点上。
+5. 两棵树合并后，新的重心在两树原重心间路径上。  
+   新的重心在较大树上；  两树大小相同，则在连接点上。
 
 几个性质不好一眼看出其证明，我们依次证明它们。
 
@@ -322,6 +338,12 @@ int main(){
 
 这样来看，**只有重心满足** $max(sz(t_i​)) \le \frac12sz(T)$ ，即证明了结论。
 
+#### 强化命题
+
+**对于非重心的任意一点，重心一定在其最大子树上**。这个命题为使用调整法打下基础，后面会反复使用。
+
+反证，设此点为 $u$ ，最大子树为 $t$ 。若 $G$ 在其较小子树上，那么由于子树大小小于整棵树，得到： $sz_G(u) > sz(t) > \frac{sz(T)}2$ ，与 $G$ 是重心矛盾。
+
 ### 证明（性质2）
 
 先证：**重心必然相邻**，这可以揭示许多性质。
@@ -366,8 +388,6 @@ $G_1$ 有一颗子树包含了 $G_2$ ，猜测：**这颗子树一定是最大�
  $sz(T_1) + sz(T_2) - sz(T_1 \cap T_1) = sz(T)$ ，    
 由性质1易知 $sz(T_1) = sz(T_2) \le \frac12sz(T)$ ，   
 矛盾！
-
-
 
 这证明了命题后半部分。
 
@@ -416,15 +436,15 @@ $dis(v)−dis(u)=n−2s$ 。
 
 设 $u$ 最小化 $dis$。对任意邻居 $v$ 有 $dis(v) − dis(u) \ge 0$。由差分公式得
 
-$n−2sz_u​(v) \ge 0⇒sz_u​(v) \le 2n$ 。
+$n−2sz_u​(v) \ge 0 \Rightarrow sz_u​(v) \le \frac{n}2$ 。
 
-这正是重心的定义条件，因此 $u$ 为重心。
+这正是重心的判定条件，因此 $u$ 为重心。
 
 ---
 
 ##### （必要性）若 $u$ 是重心，则 $dis(u)$ 最小
 
-若 u 为重心，则对任意邻居 v，有 szu​(v)≤2n​。由差分公式，
+若 $u$ 为重心，则对任意邻居 $v$ ，有 $sz_u(v) \le 2n$​。由差分公式，
 
 $dis(v)−dis(u)=n−2sz_u​(v) \ge 0$
 
@@ -446,7 +466,7 @@ $dis(v)−dis(u)=n−2sz_u​(v) \ge 0$
 
 - 若 $sz(T_2)$ 足够小，使 $sz_{G_1}(T_2) \le sz(T)$ ，则 $G_1$ 依然是树 $T$ 的重心。
 
-- 否则， $G_1$ 不再是重心，必须沿着 $(G_1, G_2)$ 的路径前进（因为只有这一个方向能减小“最大子树”）。依次调整，必然找到某点 $G'$ 满足最大子树 $\le \tfrac{sz(T)}{2}$，此时 $G'$ 就是新重心。显然 $G'$ 在 $(G_1, G_2)$ 的路径上。
+- 否则， $G_1$ 不再是重心，必须沿着 $(G_1, G_2)$ 的路径前进（因为根据性质1，只有这一个方向能减小“最大子树”）。依次调整，必然找到某点 $G'$ 满足最大子树 $\le \tfrac{sz(T)}{2}$，此时 $G'$ 就是新重心。显然 $G'$ 在 $(G_1, G_2)$ 的路径上。
 
 - 特别地，若 $sz(T_1) = sz(T_2)$，则重心恰落在 $x, y$ 处；若不等，重心落在较大树一侧。
 
@@ -456,7 +476,7 @@ $dis(v)−dis(u)=n−2sz_u​(v) \ge 0$
 
 利用性质1来求即可，时间复杂度 $O(n)$ 。
 
-```cpp title=&amp;quot;P1395.cpp&amp;quot;
+```cpp
 #include <iostream>
 #include <vector>
 
@@ -518,30 +538,182 @@ int main(){
     get_dist(res, 0);
     cout << dist;
 }
-
 ```
 
+## 04 习题
+
+[P1395 会议 - 洛谷](https://www.luogu.com.cn/problem/P1395) 板题（不带权）
+
+[P1364 医院设置 - 洛谷](https://www.luogu.com.cn/problem/P1364) 板题（带边权）
+
+[P2726 [SHOI2005] 树的双中心 - 洛谷](https://www.luogu.com.cn/problem/P2726) AC需要优化技巧
+
 # 树的中心
-
-:::important
-
-WIP / Work In Progress
-施工中
-
-:::
 
 ## 01 定义
 
 **树的中心**：树上一点，使到任意一点距离的最大值最小。
 
-可以理解为：到各点距离最平均的点。
+可以理解为：最远的地方也很近，到各点距离最平均的点。
+
+由下文性质1，可以按中心个数将树分为**单心树**和**双心树**。
 
 ## 02 性质
 
+1. 树的中心不一定唯一，但至多 $2$ 个且相邻。
+
+2. （和树的直径的关系）**树的中心一定在直径上，且使直径分得最平均**（即要么平分，要么差 $1$ ）。
+
+3. 树上所有点到其最远点的路径一定交于树的中心。
+
+4. 以树的中心为根，其到达直径两端点的路径分别最长和次长。
+
+5. 合并两树时，连接中心所得新树直径最小。
+
+6. 树的中心到其他任意节点的距离 $\le$ 树直径的一半。（反之亦然）
+
+### 证明（性质2）
+
+利用直径性质2即可。
+
+设直径为 $(s, d)$ ，对任意节点 $w$ ，到 $w$ 的最远点要么 $s$ ，要么 $d$ 。不妨设为 $s$ 。
+
+于是有： $(s, d)$ 的中点 $m$ 在 $(w, s)$ 上。（请思考：为什么？）
+
+由定义，当且仅当 $w = m$ 时， $w$ 是树的中心。
+
+事实上，由直径性质4，此点就是所有直径的交点。
+
+### 推论
+
+由此，
+
+- 性质1：至多两个中心，且相邻
+
+- 性质3：所有点到最远点的路径均交于中心
+
+- 性质4：以中心为根时，最长和次长路径就是到直径两端
+
+- 性质6：中心到其他点的最大距离不超过 $\tfrac{\text{直径长度}}{2}$ （反之亦然）
+
+均可直接推出 / 仿照上例证出。
+
+请读者尝试自证性质5。
+
 ## 03 求法
 
-# 小结
+先任取一点为根。
+
+我们可以维护从任意一点出发的最长路径长度，利用定义判断此点是否中心。
+
+在有根树上，这条路径可以向上去往根的方向，在某个祖先处拐弯向下；也可以向下一路走到底。
+
+因此需要维护”向上拐弯最长“ $up$ ，”向下最长“ $d_1$ ，”向下次短“ $d_2$ （拐弯向下会用）。DFS求解即可。
+
+```cpp
+#include <iostream>
+#include <vector>
+
+const int INF = 1e9 + 7;
+
+using namespace std;
+
+struct Edge {
+    int v;
+    int l;
+};
+vector<Edge> graph[1000005];
+
+void add(int u, int v, int len) {
+    graph[u].push_back(Edge({v, len}));
+    graph[v].push_back(Edge({u, len}));
+}
+
+int d1[1000005];
+int d2[1000005];
+int up[1000005];
+
+// 类似于树的直径，这说明树的中心与直径关系紧密
+void dfs_d(int p, int fa) {
+    for (Edge ch : graph[p]) {
+        if (ch.v == fa) continue;
+        dfs_d(ch.v, p);
+        
+        int d_new = d1[ch.v] + ch.l;
+        if (d_new > d1[p]) {
+            d2[p] = d1[p];
+            d1[p] = d_new;
+        } else {
+            d2[p] = max(d_new, d2[p]);
+        }
+    }
+}
+
+void dfs_u(int p, int fa) {
+    for (Edge ch : graph[p]) {
+        if (ch.v == fa) continue;
+        up[ch.v] = up[p] + ch.l;
+        /*
+         * 先判断是否在最长路上，若是则需要用次长路更新up
+         * 否则，用最长路更新即可
+         */
+        if (d1[ch.v] + ch.l == d1[p]) {
+            up[ch.v] = max(up[ch.v], d2[p] + ch.l);
+        } else {
+            up[ch.v] = max(up[ch.v], d1[p] + ch.l);
+        }
+
+        dfs_u(ch.v, p);
+    }
+}
+
+int main(){
+    int n;
+    cin >> n;
+
+    for (int i = 1; i < n; i++) {
+        int u, v, len;
+        cin >> u >> v >> len;
+        add(u, v, len);
+    }
+
+    dfs_d(1, 0);
+    dfs_u(1, 0);
+
+    int radio = INF;
+    int center = 1;
+    int center2 = 0;
+    for (int i = 1; i < n; i++) {
+        int max_d = max(d1[i], up[i]);
+        if (max_d < radio) {
+            center = i;
+            center2 = 0;
+            radio = max_d;
+        } else if (max_d == radio) {
+            center2 = i;
+        }
+    }
+
+    cout << center << endl;
+    if (center2) cout << center2;
+}
+
+```
+
+## 04 习题
+
+[U392706 【模板】树的中心 - 洛谷](https://www.luogu.com.cn/problem/U392706) 
+
+[P5536 【XR-3】核心城市 - 洛谷](https://www.luogu.com.cn/problem/P5536) 没错我又来了
+
+# Credits
 
 参考资料：
 
+[图论专题-学习笔记：树的直径 - Plozia - 博客园](https://www.cnblogs.com/Plozia/p/16155839.html)
+
 [算法学习笔记(72): 树的重心](https://zhuanlan.zhihu.com/p/357938161)
+
+[OI Wiki](oi.wiki)
+
+感谢 [Graph Online](graphonline.top) 提供的图论可视化工具
