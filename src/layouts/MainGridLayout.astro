@@ -6,6 +6,7 @@ import SideBar from "@components/widget/SideBar.astro";
 import type { MarkdownHeading } from "astro";
 import { Icon } from "astro-icon/components";
 import ImageWrapper from "../components/misc/ImageWrapper.astro";
+import BannerVideo from "../components/misc/BannerVideo.astro";
 import TOC from "../components/widget/TOC.astro";
 import { siteConfig } from "../config";
 import {
@@ -35,6 +36,7 @@ const {
 const hasBannerCredit =
 	siteConfig.banner.enable && siteConfig.banner.credit.enable;
 const hasBannerLink = !!siteConfig.banner.credit.url;
+const hasVideoBanner = siteConfig.banner.enable && siteConfig.banner.video?.src;
 
 const mainPanelTop = siteConfig.banner.enable
 	? `calc(${BANNER_HEIGHT}vh - ${MAIN_PANEL_OVERLAPS_BANNER_HEIGHT}rem)`
@@ -53,10 +55,29 @@ const mainPanelTop = siteConfig.banner.enable
 
 <!-- Banner -->
 {siteConfig.banner.enable && <div id="banner-wrapper" class={`absolute z-10 w-full transition duration-700 overflow-hidden`} style={`top: -${BANNER_HEIGHT_EXTEND}vh`}>
-    <ImageWrapper id="banner" alt="Banner image of the blog" class:list={["object-cover h-full transition duration-700 opacity-0 scale-105"]}
-                  src={siteConfig.banner.src} position={siteConfig.banner.position}
-    >
-    </ImageWrapper>
+    {hasVideoBanner ? (
+        <BannerVideo 
+            id="banner" 
+            alt="Banner of the blog" 
+            class:list={["object-cover h-full transition duration-700 opacity-0 scale-105"]}
+            imageSrc={siteConfig.banner.src} 
+            videoSrc={siteConfig.banner.video?.src}
+            position={siteConfig.banner.position}
+            autoplay={siteConfig.banner.video?.autoplay ?? true}
+            loop={siteConfig.banner.video?.loop ?? true}
+            muted={siteConfig.banner.video?.muted ?? true}
+            playsinline={siteConfig.banner.video?.playsinline ?? true}
+            videoOffsetY={siteConfig.banner.video?.offsetY}
+        />
+    ) : (
+        <ImageWrapper 
+            id="banner" 
+            alt="Banner image of the blog" 
+            class:list={["object-cover h-full transition duration-700 opacity-0 scale-105"]}
+            src={siteConfig.banner.src} 
+            position={siteConfig.banner.position}
+        />
+    )}
 </div>}
 
 <!-- Main content -->

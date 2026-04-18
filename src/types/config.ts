@@ -24,6 +24,14 @@ export type SiteConfig = {
 		enable: boolean;
 		src: string;
 		position?: "top" | "center" | "bottom";
+		video?: {
+			src: string;
+			autoplay?: boolean;
+			loop?: boolean;
+			muted?: boolean;
+			playsinline?: boolean;
+			offsetY?: string;
+		};
 		credit: {
 			enable: boolean;
 			text: string;

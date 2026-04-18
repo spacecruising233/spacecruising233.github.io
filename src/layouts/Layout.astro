@@ -361,6 +361,13 @@ function showBanner() {
 	}
 
 	banner.classList.remove('opacity-0', 'scale-105');
+	
+	const video = banner.querySelector('.banner-video');
+	if (video && video instanceof HTMLVideoElement) {
+		video.play().catch(() => {
+			console.log('Video autoplay failed, showing fallback image');
+		});
+	}
 }
 
 function init() {
