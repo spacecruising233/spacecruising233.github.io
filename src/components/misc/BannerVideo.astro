@@ -37,7 +37,7 @@ const isLocalImage = !(
 	imageSrc.startsWith("data:")
 );
 
-let img;
+let img: ImageMetadata | undefined;
 if (isLocalImage) {
 	const files = import.meta.glob<ImageMetadata>("../../**", {
 		import: "default",
