@@ -68,6 +68,7 @@ const mainPanelTop = siteConfig.banner.enable
             muted={siteConfig.banner.video?.muted ?? true}
             playsinline={siteConfig.banner.video?.playsinline ?? true}
             videoOffsetY={siteConfig.banner.video?.offsetY}
+            disableOnMobile={siteConfig.banner.video?.disableOnMobile ?? true}
         />
     ) : (
         <ImageWrapper 

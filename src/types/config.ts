@@ -31,6 +31,7 @@ export type SiteConfig = {
 			muted?: boolean;
 			playsinline?: boolean;
 			offsetY?: string;
+			disableOnMobile?: boolean;
 		};
 		credit: {
 			enable: boolean;

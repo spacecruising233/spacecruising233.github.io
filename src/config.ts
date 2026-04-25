@@ -26,6 +26,7 @@ export const siteConfig: SiteConfig = {
 			muted: true,
 			playsinline: true,
 			offsetY: "25%",
+			disableOnMobile: true, // Disable video playback on mobile devices
 		},
 		credit: {
 			enable: false, // Display the credit text of the banner image

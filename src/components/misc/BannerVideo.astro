@@ -14,6 +14,7 @@ interface Props {
 	muted?: boolean;
 	playsinline?: boolean;
 	videoOffsetY?: string;
+	disableOnMobile?: boolean;
 }
 
 const {
@@ -27,6 +28,7 @@ const {
 	muted = true,
 	playsinline = true,
 	videoOffsetY = "60%",
+	disableOnMobile = true,
 } = Astro.props;
 const className = Astro.props.class;
 
@@ -56,7 +58,7 @@ const imageStyle = `object-position: ${position}`;
 const videoStyle = `object-position: center ${videoOffsetY}`;
 ---
 
-<div id={id} class:list={[className, "banner-video-container overflow-hidden relative"]}>
+<div id={id} class:list={[className, "banner-video-container overflow-hidden relative"]} data-disable-video-on-mobile={disableOnMobile}>
 	<div class="transition absolute inset-0 dark:bg-black/10 bg-opacity-50 pointer-events-none z-10"></div>
 	
 	<picture class="banner-fallback absolute inset-0 w-full h-full">
@@ -78,6 +80,7 @@ const videoStyle = `object-position: center ${videoOffsetY}`;
 			playsinline={playsinline}
 			preload="auto"
 			poster={isLocalImage ? undefined : imageSrc}
+			data-src={videoSrc}
 		>
 			<source src={videoSrc} type="video/webm" />
 			<source src={videoSrc.replace(/\.webm$/, ".mp4")} type="video/mp4" />
@@ -85,15 +88,38 @@ const videoStyle = `object-position: center ${videoOffsetY}`;
 	)}
 </div>
 
-<script define:vars={{ videoSrc }}>
+<script define:vars={{ disableOnMobile }}>
+	function isMobileDevice() {
+		if (typeof window === 'undefined') return false;
+		
+		const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+		const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+		const isSmallScreen = window.screen.width < 768;
+		const isMobileUserAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+		
+		return (isCoarsePointer && isSmallScreen) || (isTouchDevice && isSmallScreen) || (isMobileUserAgent && isSmallScreen);
+	}
+
 	function initBannerVideo() {
 		const containers = document.querySelectorAll('.banner-video-container');
 		
 		containers.forEach(container => {
+			const shouldDisableVideo = container.dataset.disableVideoOnMobile === 'true' && isMobileDevice();
 			const video = container.querySelector('.banner-video');
 			const fallback = container.querySelector('.banner-fallback');
 			
-			if (!video || !videoSrc) return;
+			if (!video) return;
+			
+			if (shouldDisableVideo) {
+				video.remove();
+				if (fallback) {
+					fallback.classList.remove('opacity-0');
+				}
+				return;
+			}
+			
+			const videoSrc = video.dataset.src;
+			if (!videoSrc) return;
 			
 			video.addEventListener('loadeddata', () => {
 				video.classList.remove('opacity-0');
