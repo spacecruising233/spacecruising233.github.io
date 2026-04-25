@@ -12,6 +12,18 @@ import NavMenuPanel from "./widget/NavMenuPanel.astro";
 
 const className = Astro.props.class;
 
+const navbarStyle = navBarConfig.style ?? {
+	transparent: false,
+	blur: true,
+	blurIntensity: 12,
+	bgOpacity: 0.85,
+};
+
+const isTransparent = navbarStyle.transparent;
+const isBlurred = navbarStyle.blur && (isTransparent || navbarStyle.blur);
+const blurIntensity = navbarStyle.blurIntensity ?? 12;
+const bgOpacity = navbarStyle.bgOpacity ?? 0.85;
+
 let links: NavBarLink[] = navBarConfig.links.map(
 	(item: NavBarLink | LinkPreset): NavBarLink => {
 		if (typeof item === "number") {
@@ -21,11 +33,15 @@ let links: NavBarLink[] = navBarConfig.links.map(
 	},
 );
 ---
-<div id="navbar" class="z-50 onload-animation">
-    <div class="absolute h-8 left-0 right-0 -top-8 bg-[var(--card-bg)] transition"></div> <!-- used for onload animation -->
+<div id="navbar" class:list={["z-50 onload-animation", { "navbar-transparent": isTransparent }]} style={isTransparent ? `--navbar-blur: ${blurIntensity}px; --navbar-opacity: ${bgOpacity};` : undefined}>
+    <div class="absolute h-8 left-0 right-0 -top-8 transition" style={isTransparent ? `background: transparent;` : 'background: var(--card-bg)'}></div> <!-- used for onload animation -->
     <div class:list={[
         className,
-        "card-base !overflow-visible max-w-[var(--page-width)] h-[4.5rem] !rounded-t-none mx-auto flex items-center justify-between px-4"]}>
+        "navbar-container !overflow-visible max-w-[var(--page-width)] h-[4.5rem] rounded-b-[var(--radius-large)] mx-auto flex items-center justify-between px-4",
+        { 
+            "navbar-transparent": isTransparent
+        }
+    ]} style={!isTransparent ? `background: var(--card-bg);` : undefined}>
         <a href={url('/')} class="btn-plain scale-animation rounded-lg h-[3.25rem] px-5 font-bold active:scale-95">
             <div class="flex flex-row text-[var(--primary)] items-center text-md">
                 <Icon name="material-symbols:home-outline-rounded" class="text-[1.75rem] mb-1 mr-2" />
@@ -140,3 +156,15 @@ if (document.readyState === 'loading') {
     loadPagefind();
 }
 </script>}
+
+<style>
+    .navbar-container.navbar-transparent {
+        backdrop-filter: blur(var(--navbar-blur, 12px));
+        -webkit-backdrop-filter: blur(var(--navbar-blur, 12px));
+        background: rgba(var(--card-bg-rgb), var(--navbar-opacity, 0.85));
+    }
+
+    :global(.dark) .navbar-container.navbar-transparent {
+        background: rgba(var(--card-bg-rgb), var(--navbar-opacity, 0.85));
+    }
+</style>

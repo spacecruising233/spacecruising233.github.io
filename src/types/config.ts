@@ -1,5 +1,12 @@
 import type { AUTO_MODE, DARK_MODE, LIGHT_MODE } from "@constants/constants";
 
+export type NavBarStyle = {
+	transparent?: boolean;
+	blur?: boolean;
+	blurIntensity?: number;
+	bgOpacity?: number;
+};
+
 export type SiteConfig = {
 	title: string;
 	subtitle: string;
@@ -67,6 +74,7 @@ export type NavBarLink = {
 
 export type NavBarConfig = {
 	links: (NavBarLink | LinkPreset)[];
+	style?: NavBarStyle;
 };
 
 export type ProfileConfig = {

@@ -59,6 +59,12 @@ export const navBarConfig: NavBarConfig = {
 			external: true, // Show an external link icon and will open in a new tab
 		},
 	],
+	style: {
+		transparent: true, // Enable transparent navbar
+		blur: false, // Enable blur effect (glassmorphism)
+		blurIntensity: 12, // Blur intensity in pixels (0-20)
+		bgOpacity: 0.55, // Background opacity (0-1), only effective when transparent is true
+	},
 };
 
 export const profileConfig: ProfileConfig = {
