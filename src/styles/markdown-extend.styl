@@ -74,6 +74,26 @@
   img
     border-radius: 0.75rem
 
+  .mermaid
+    margin: 1.5rem auto
+    max-width: 100%
+    overflow-x: auto
+    text-align: center
+
+    svg
+      max-width: 100%
+      height: auto
+
+    &.mermaid-error
+      font-family: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace
+      font-size: 0.875rem
+      line-height: 1.5rem
+      text-align: left
+      white-space: pre
+      background: var(--codeblock-bg)
+      border-radius: 0.75rem
+      padding: 1rem
+
   hr
     border-color: var(--line-divider)
     border-style: dashed

@@ -1,6 +1,8 @@
 ---
 import "@fontsource-variable/jetbrains-mono";
 import "@fontsource-variable/jetbrains-mono/wght-italic.css";
+import "@/styles/markdown.css";
+import "@/styles/markdown-extend.styl";
 
 interface Props {
 	class: string;
@@ -40,4 +42,130 @@ document.addEventListener("click", function (e: MouseEvent) {
         target.setAttribute("data-timeout-id", newTimeoutId.toString());
     }
 });
+
+// ---- Mermaid support ----
+// Mermaid is bundled locally from the `mermaid` npm dependency.
+// It is dynamically imported only on pages that actually contain diagrams.
+
+function getCodeSource(pre: HTMLElement): string {
+    const codeEl = pre.querySelector("code");
+    if (!codeEl) return "";
+
+    const codeLines = codeEl.querySelectorAll(".code:not(summary *)");
+    if (codeLines.length > 0) {
+        return Array.from(codeLines)
+            .map((el) => el.textContent)
+            .map((t) => t === "\n" ? "" : t)
+            .join("\n")
+            .trim();
+    }
+
+    return codeEl.textContent?.trim() ?? "";
+}
+
+// astro-expressive-code injects its external stylesheet <link> and module
+// <script> into the FIRST code block's .expressive-code wrapper (see its
+// postprocessRenderedBlockGroup hook). If that first block is a mermaid
+// diagram, replacing the whole wrapper below would remove those assets from
+// the DOM and the browser would drop the EC stylesheet, breaking the layout
+// (line numbers get mixed into the text) for every code block on the page.
+// Move any such assets to <head> before the wrapper is removed.
+function preserveWrapperAssets(wrapper: HTMLElement) {
+    wrapper
+        .querySelectorAll<HTMLLinkElement | HTMLScriptElement>("link[rel='stylesheet'], script[src]")
+        .forEach((el) => document.head.append(el));
+}
+
+function collectMermaidNodes(): HTMLElement[] {
+    const nodes: HTMLElement[] = [];
+
+    // Expressive Code renders fenced code blocks as:
+    // <div class="expressive-code"><pre data-language="mermaid">...
+    // Replace the whole Expressive Code wrapper with a plain .mermaid container.
+    document
+        .querySelectorAll<HTMLElement>("pre[data-language='mermaid']")
+        .forEach((pre) => {
+            const wrapper = pre.closest(".expressive-code") ?? pre;
+            if (wrapper.hasAttribute("data-mermaid-processed")) return;
+            const source = getCodeSource(pre);
+            if (!source) return;
+
+            preserveWrapperAssets(wrapper);
+            const container = document.createElement("div");
+            container.className = "mermaid";
+            container.dataset.pagefindIgnore = "true";
+            container.dataset.mermaidPending = "true";
+            container.textContent = source;
+            wrapper.replaceWith(container);
+            nodes.push(container);
+        });
+
+    // Fallback for plain Markdown output (when Expressive Code is not involved).
+    document
+        .querySelectorAll<HTMLElement>("pre > code.language-mermaid")
+        .forEach((codeEl) => {
+            const pre = codeEl.closest("pre");
+            if (!pre || pre.hasAttribute("data-mermaid-processed")) return;
+            const source = getCodeSource(pre);
+            if (!source) return;
+
+            const container = document.createElement("div");
+            container.className = "mermaid";
+            container.dataset.pagefindIgnore = "true";
+            container.dataset.mermaidPending = "true";
+            container.textContent = source;
+            pre.replaceWith(container);
+            nodes.push(container);
+        });
+
+    // Also support manually authored <div class="mermaid"> blocks.
+    document
+        .querySelectorAll<HTMLElement>(".mermaid:not([data-mermaid-processed]):not([data-mermaid-pending])")
+        .forEach((node) => {
+            if (node.querySelector("svg")) return;
+            node.dataset.mermaidPending = "true";
+            nodes.push(node);
+        });
+
+    return nodes;
+}
+
+async function renderMermaid() {
+    const nodes = collectMermaidNodes();
+    if (nodes.length === 0) return;
+
+    try {
+        const { default: mermaid } = await import("mermaid");
+        mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: "loose",
+            theme: document.documentElement.classList.contains("dark") ? "dark" : "default",
+        });
+        const visibleNodes = nodes.filter((node) => node.isConnected);
+        if (visibleNodes.length === 0) return;
+
+        for (const node of visibleNodes) {
+            try {
+                await mermaid.run({ nodes: [node] });
+                node.removeAttribute("data-mermaid-pending");
+                node.setAttribute("data-mermaid-processed", "true");
+            } catch (error) {
+                console.error("[Mermaid] Failed to render diagram:", error);
+                node.classList.add("mermaid-error");
+                node.removeAttribute("data-mermaid-pending");
+                node.setAttribute("data-mermaid-processed", "true");
+            }
+        }
+    } catch (error) {
+        console.error("[Mermaid] Failed to initialize Mermaid:", error);
+        nodes.forEach((node) => {
+            node.classList.add("mermaid-error");
+            node.removeAttribute("data-mermaid-pending");
+            node.setAttribute("data-mermaid-processed", "true");
+        });
+    }
+}
+
+renderMermaid();
+document.addEventListener("astro:page-load", renderMermaid);
 </script>
